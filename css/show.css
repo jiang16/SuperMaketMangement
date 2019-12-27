@@ -1,0 +1,13 @@
+
+        
+			.input{
+         
+              border:none;
+              border-radius:0;
+              border-bottom:#8D8D8D 0px solid;
+             box-shadow: 0px 0px 0px 0px;
+              outline: none;
+          
+            }
+
+			.sgBtn{width: 135px; height: 35px; line-height: 35px; margin-left: 10px; margin-top: 10px; text-align: center; background-color: #0095D9; color: #FFFFFF; float: left; border-radius: 5px;}

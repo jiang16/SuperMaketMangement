@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<meta name="format-detection" content="telephone=no">
+		<title>超市进销存系统</title>
+		<!--vue js 以及 element js css-->
+		<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+		<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<script src="js/leftright.js"></script>
+
+		<!-- 布局外部css -->
+		<link rel="stylesheet" type="text/css" href="css/common.css" />
+
+		<link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/element-ui.css">
+		<script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+		<script type="text/javascript" src="js/vue.min.js"></script>
+		<script src="js/element-ui.js"></script>
+
+		<!--布局外部js-->
+
+		<style>
+			.el-select .el-input {
+				width: 130px;
+			}
+			
+			.input-with-select .el-input-group__prepend {
+				background-color: #fff;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div id="head" style="height:50px;background-color:#0099FF;">
+
+			<div class="head-left" style="float:left;width:400px;height:50px;margin-top:3px;">
+				<div id="logoDiv">
+					<img id="logo" src="img/car.png"><span>超市进销存管理系统</span>
+				</div>
+			</div>
+			<div class="head-right" style="float:right;width:400px;height:50px;margin-top:3px;">
+
+				<p style="float:right;margin-top:10px;margin-right:50px;color:white;font-family: '微软雅黑';font-size: 17px;font-weight:bold;"><span id="timeSlot"></span>，<span id="role" style="color: #FFCC00;">系统用户</span>，欢迎你！</p>
+
+			</div>
+
+		</div>
+		<div id="showTime" style="height: 30px; background-color: #99CCFF;">
+			<div id="ctime" style="height: 30px;width:250px;margin: 0 auto;">
+
+				<div id="clock" style="float:left;width: 30px;">
+					<img src="img/time.png" style="height: 25px;" />
+				</div>
+
+				<div id="currentTime" style="float:right;padding-top:3px;font-family: '微软雅黑';color:#9966FF;">
+					{{ctime}}
+				</div>
+
+			</div>
+
+		</div>
+		<script>
+			new Vue({
+				el: "#showTime",
+				data() {
+					return {
+						ctime: '',
+						date: new Date()
+					}
+				},
+				methods: {
+					getCurrentTime(date) {
+
+						var myDate = date;
+						var year = myDate.getFullYear().toString();
+						var month = (myDate.getMonth() + 1).toString();
+						var day = myDate.getDate().toString();
+						var hours = myDate.getHours().toString();
+						var minute = myDate.getMinutes().toString();
+						var seconds = myDate.getSeconds().toString();
+						if((myDate.getHours() >= 6) && (myDate.getHours() <= 12)) {
+							document.getElementById("timeSlot").innerHTML = "早上好";
+						} else if((myDate.getHours() >= 13) && (myDate.getHours() <= 18)) {
+							document.getElementById("timeSlot").innerHTML = "下午好";
+						} else if((myDate.getHours() >= 19) && (myDate.getHours() <= 24)) {
+							document.getElementById("timeSlot").innerHTML = "晚上好";
+						}
+						if(month.length == 1) {
+							month = "0" + month;
+						}
+						if(day.length == 1) {
+							day = "0" + day;
+						}
+						if(hours.length == 1) {
+							hours = "0" + hours;
+						}
+						if(minute.length == 1) {
+							minute = "0" + minute;
+						}
+						if(seconds.length == 1) {
+							seconds = "0" + seconds;
+						}
+						var d = new Array('星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六');
+						var week = myDate.getDay();
+
+						this.ctime = year + "年" + month + "月" + day + "日" + " " + hours + ":" + minute + ":" + seconds + " " + d[week];
+
+					}
+
+				},
+				mounted() {
+					var _this = this; // 声明一个变量指向Vue实例this，保证作用域一致
+					this.timer = setInterval(function() {
+						_this.date = new Date();
+						_this.getCurrentTime(_this.date);
+					}, 1000);
+
+				},
+				beforeDestroy() {
+					if(this.timer) {
+						clearInterval(this.timer);
+					}
+				}
+
+			});
+		</script>
+
+		<div id="wrap">
+			<!-- 左侧菜单栏目块 -->
+			<div class="leftMeun" id="leftMeun">
+
+				<div id="personInfor" style="padding-left:9px;padding-top: 2px;">
+
+					<p style="text-align:center;">
+						<font size="3" color="GhostWhite">个人信息</font>
+					</p>
+					<hr style="margin-top: 1px;">
+					<span>工号:{{userid}}</span>
+					<br/>
+					<span>姓名:{{username}}</span>
+					<br/>
+					<span>登录时间:{{loginTime}}</span>
+					<br/>
+
+					<span>登录次数:{{countLogin}}</span>
+					<br/>
+					<el-button @click="exitBtn" style="margin-top: 20px;margin-left: 46px;" size="small" round type="info">退出登录</el-button>
+
+					<!-- <el-button type="success" style="float:right;">成功按钮</el-button>-->
+				</div>
+
+				<p style="text-align:center;margin-top: 8px;">
+					<font size="3" color="GhostWhite">功能列表</font>
+				</p>
+				<hr style="margin-top: 1px;width:170px;">
+				<div class="meun-item meun-item-active" href="#sour" aria-controls="sour" role="tab" data-toggle="tab"><img src="img/icon_source.png">商品销售</div>
+				<div class="meun-item" href="#regu" aria-controls="regu" role="tab" data-toggle="tab"><img src="img/icon_user_grey.png">退货管理</div>
+				<div class="meun-item" href="#char" aria-controls="char" role="tab" data-toggle="tab"><img src="img/icon_rule_grey.png">退货详情</div>
+			</div>
+
+			<!-- 右侧具体内容栏目 -->
+			<div id="rightContent">
+
+				<!-- Tab panes -->
+				<div class="tab-content">
+					<!-- 商品销售模块 -->
+					<div role="tabpanel" class="tab-pane active" id="sour">
+
+						<!-- 商品销售从这正式开始 -->
+						<div class="main-top" style="background-color:white;height:51px;">
+							<div class="modal-header">
+								<h4 style="float:left;" class="modal-title" id="gridSystemModalLabel">商品销售</h4>
+								<br/>
+								<!--	<h4 style="float:left;display: none;" class="modal-title" id="gridSystemModalLabel">商品销售</h4>-->
+
+							</div>
+
+						</div>
+
+						<!-- 显示 -->
+						<div class="data-div">
+							<el-tabs type="border-card" @tab-click="handleClick">
+								<div style="margin-top: 15px;margin-bottom: 15px;">
+									<el-input style="width:300px;margin-left: 100px;float:left;" placeholder="请输入商品名称" v-model="input3" class="input-with-select">
+										<el-button @click="search" slot="append" icon="el-icon-search"></el-button>
+									</el-input>
+								</div>
+
+								<el-tab-pane label="全部商品">
+									<el-table ref="multipleTable" :data="tableData" @selection-change="GoodshandleSelectionChange" :row-key="(row)=>{ return row.goodid}" style="width: 100%" :default-sort="{prop: 'goodid', order: 'ascing'}">
+										<el-table-column type="selection" width="55" :reserve-selection="true">
+										</el-table-column>
+										<el-table-column prop="goodid" label="商品编号" sortable width="100">
+										</el-table-column>
+										<el-table-column prop="goodname" label="商品名称" width="180">
+										</el-table-column>
+										<el-table-column prop="stock" label="库存" sortable width="180">
+										</el-table-column>
+										<el-table-column prop="category" label="种类" sortable width="180">
+										</el-table-column>
+										<el-table-column prop="price" label="售价(单价)" sortable width="180">
+										</el-table-column>
+										<el-table-column prop="memberprice" label="会员价" sortable width="180">
+										</el-table-column>
+										<el-table-column prop="dao" label="操作" width="160">
+											<template slot-scope="scope">
+
+												<el-input-number :min="1" step=1 step-strictly="true" @change="handleChange" size="mini" v-model="scope.row.buy_num"></el-input-number>
+
+											</template>
+										</el-table-column>
+
+									</el-table>
+									<!--分页-->
+									<div style="width:100%;height: 10%;">
+										<el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pagination.currentPage" :page-sizes="[1,2,3,4,5,6,7]" :page-size="pagination.pageSize" layout="total,  prev, pager, next, jumper,sizes" :total="page.totalCount">
+										</el-pagination>
+									</div>
+								</el-tab-pane>
+								<br/>
+
+								<el-row style="width:82%; box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)">
+									<el-col>
+										<div style="float:left;">
+											<template>
+												<el-radio v-model="radio" label="普通">普通</el-radio>
+												<el-radio v-model="radio" label="会员" @change="btnmember">会员</el-radio>
+											</template>
+
+										</div style="float:right;">
+										<span style="float:left;margin-left:100px;font-size:15px">共 {{page.totalCount}}件商品，已选择{{total_num}}件</span>
+										<div style="float:right;margin-right:120px;">
+											</span>合计： {{total_price}}元
+											<el-button type="primary" @click="Settlement">结算</el-button>
+										</div>
+									</el-col>
+
+								</el-row>
+
+							</el-tabs>
+						</div>
+						<!--订单详情-->
+						<el-dialog title="商品销售详情" :visible.sync="dialogTableVisible">
+							<el-table :data="gridData">
+								<el-table-column property="goodname" label="商品名称" width="150"></el-table-column>
+								<el-table-column property="buy_num" label="销售数量" width="200"></el-table-column>
+
+							</el-table>
+							<div slot="footer" class="dialog-footer">
+
+								<el-button type="primary" @click="sureSel">确 定</el-button>
+							</div>
+						</el-dialog>
+					</div>
+
+					<!--退货管理-->
+					<div role="tabpanel" class="tab-pane" id="regu">
+
+			
+
+						<!-- 退货管理从这开始 -->
+						<div class="main-top" style="background-color:white;height:55px;">
+							<div class="modal-header">
+								<h4 class="modal-title" id="gridSystemModalLabel">退货管理</h4>
+							</div>
+
+						</div>
+						<div class="data-div">
+							<div class="panel panel-default">
+								<div class="panel-body">
+									<el-alert style="width:30%;margin-left:375px;" title="提示：可以只输入需要退货的商品号即可" type="warning" show-icon>
+									</el-alert>
+									<el-form style="margin-left:270px;width:40%;" :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+										
+										<el-form-item label="商品号:" prop="goodid">
+											<el-input @blur="handleInputConfirm" v-model="ruleForm.goodid"></el-input>
+										</el-form-item>
+										<el-form-item label="商品名:" prop="goodname">
+											<el-input v-model="ruleForm.goodname" :disabled="true"></el-input>
+										</el-form-item>
+										<el-form-item label="退货量:" prop="stock">
+											<el-input v-model="ruleForm.stock" :disabled="true"></el-input>
+										</el-form-item>
+
+										<el-form-item label="供应商:" prop="supplier">
+											<el-input v-model="ruleForm.supplier" :disabled="true"></el-input>
+										</el-form-item>
+										<el-form-item label="供应商电话:" prop="supplierphone">
+											<el-input v-model="ruleForm.supplierphone" :disabled="true"></el-input>
+										</el-form-item>
+										<el-form-item label="供应商地址:" prop="sullieraddress">
+											<el-input v-model="ruleForm.supplieraddress" :disabled="true"></el-input>
+										</el-form-item>
+
+										<el-form-item style="margin-left: 80px;">
+											<el-button type="primary" @click="returnForm('ruleForm')">立即退货</el-button>
+											<el-button @click="resetForm('ruleForm')">重置</el-button>
+										</el-form-item>
+									</el-form>
+								</div>
+							</div>
+						</div>
+					</div>
+				
+				
+					<!--退货详情-->
+					<div role="tabpanel" class="tab-pane" id="char">
+
+					
+
+						<!-- 退货详情从这开始 -->
+						<div class="main-top" style="background-color:white;height:55px;">
+							<div class="modal-header">
+								<h4 class="modal-title" id="gridSystemModalLabel">退货详情</h4>
+							</div>
+
+						</div>
+						<div class="data-div">
+							<div class="panel panel-default">
+								<div class="panel-body">
+									<el-table :data="tableDataReturn"  style="width: 100%" :default-sort="{prop: 'return', order: 'descending'}">
+										<el-table-column prop="goodid" label="商品号" width="180">
+										</el-table-column>
+										<el-table-column prop="goodname" label="商品名"  width="160">
+										</el-table-column>
+										<el-table-column prop="returnquantity" label="退货量" width="160">
+										</el-table-column>
+										<el-table-column prop="supplier" label="供应商"  width="160">
+										</el-table-column>
+										<el-table-column prop="returndate" label="退货日期" sortable width="160">
+										</el-table-column>
+										<el-table-column prop="saleman" label="操作人" width="160">
+										</el-table-column>
+										<el-table-column prop="" label="操作" :formatter="formatter">
+											<template slot-scope="scope">
+						
+												<el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+											</template>
+										</el-table-column>
+									</el-table>
+									<!--分页-->
+									<div style="width:100%;height: 10%;">
+										<el-pagination @size-change="handleSizeChangeReturn" @current-change="handleCurrentChangeReturn" :current-page="paginationReturn.currentPage" :page-sizes="[1,2,3,4,5,6,7]" :page-size="paginationReturn.pageSize" layout="total,  prev, pager, next, jumper,sizes" :total="pageReturn.totalCount">
+										</el-pagination>
+									</div>
+								</div>
+							</div>
+						</div>
+					
+					
+					</div>
+				
+				
+				
+				
+				
+				</div>
+			</div>
+
+		</div>
+
+		<script>
+			new Vue({
+				el: "#wrap",
+				data() {
+					return {
+
+						radio: '普通',
+						userid: '',
+						username: '',
+						loginTime: '',
+						countTime: '',
+						countLogin: '',
+						data_length: '',
+						tableData: [],
+						check_list: [],
+						input3: '',
+
+						pagination: {
+							currentPage: 1,
+							pageSize: 6
+						},
+						page: {
+							totalCount: 0,
+							totalPage: 0
+						},
+						searchGood: {
+							pagination: '',
+							content: ''
+						},
+						total_num: 0,
+						total_price: 0,
+						multipleSelection: [],
+						dialogTableVisible: false,
+						gridData: [],
+						settlementGood: {
+							pagination: '',
+							content: '',
+							saleman: '',
+							pradio: '',
+						},
+						ruleForm: {
+							name: '',
+							region: '',
+							date1: '',
+							date2: '',
+							delivery: false,
+							type: [],
+							resource: '',
+							desc: ''
+						},
+						rules: {
+							goodid: [{
+									required: true,
+									message: '请输入商品号',
+									trigger: 'blur'
+								},
+								{
+									min: 5,
+									max: 5,
+									message: '长度为 5 个字符',
+									trigger: 'blur'
+								}
+							],
+
+						},
+						returngood:{
+							goodid:'',
+							goodname:'',
+							returnquantity:'',
+							supplier:'',
+							saleman:'',
+							samemanid:''
+						},
+						tableDataReturn:[],
+						paginationReturn: {
+							currentPage: 1,
+							pageSize: 6
+						},
+						pageReturn: {
+							totalCount: 0,
+							totalPage: 0
+						},
+
+					}
+				},
+				methods: {
+					//删除一条退货记录
+					handleDelete(index,row){
+					
+						this.$confirm('确定删除此记录?', '提示', {
+									confirmButtonText: '确定',
+									cancelButtonText: '取消',
+									type: 'warning'
+								}).then(() => {
+									var _this = this;
+									$.ajax({
+										url: 'http://localhost:8012/goods/delReturnRecord',
+										type: 'post',
+										contentType: 'application/json',
+										data:row.goodid,
+										dataType: 'json',
+										success: function(data) {
+											if(data.success) {
+
+												_this.$message({
+													type: 'success',
+													message: '删除成功!'
+												});
+												_this.getAllReturnGood();
+											} else {
+												_this.$message.error(data.message);
+											}
+										}
+									});
+
+								}).catch(() => {
+									this.$message({
+										type: 'info',
+										message: '已取消删除'
+									});
+								});
+					},
+					handleCurrentChangeReturn(){
+						this.paginationReturn.currentPage = currentPage;
+						this.getAllReturnGood();
+					},
+					handleSizeChangeReturn(){
+						this.paginationReturn.pageSize = pageSize;
+						this.getAllReturnGood();
+					},
+					getAllReturnGood(){
+						var _this = this;
+						$.ajax({
+							url: 'http://localhost:8012/goods/allReturnGoods',
+							type: 'post',
+							contentType: 'application/json',
+							data: JSON.stringify(_this.paginationReturn),
+							dataType: 'json',
+							success: function(data) {
+
+								if(data.success) {
+									_this.tableDataReturn = data.data;
+
+									_this.pageReturn.totalCount = data.totalCount;
+									_this.pageReturn.totalPage = data.totalPage;
+								
+								} else {
+									_this.$message.error(data.message);
+								}
+							}
+						});
+					},
+					//失去焦点事件 商品号
+					handleInputConfirm() {
+						var _this = this;
+
+						$.ajax({
+							url: 'http://localhost:8012/goods/getGoodsInfo',
+							type: 'post',
+							contentType: 'application/json',
+							data: _this.ruleForm.goodid,
+							dataType: 'json',
+							success: function(data) {
+								if(data.success) {
+
+									_this.ruleForm = data.data;
+									//_this.$message.success(data.message);
+								} else {
+									_this.$message.error(data.message);
+								}
+							}
+						});
+					},
+					//退货管理
+					returnForm(formName) {
+						this.$refs[formName].validate((valid) => {
+							if(valid) {
+								this.returngood.goodid = this.ruleForm.goodid;
+								this.returngood.goodname = this.ruleForm.goodname;
+								this.returngood.returnquantity = this.ruleForm.stock;
+								this.returngood.supplier = this.ruleForm.supplier;
+								this.returngood.saleman = JSON.parse(sessionStorage.getItem("user")).username
+								this.returngood.salemanid = JSON.parse(sessionStorage.getItem("user")).userid;
+								
+							
+								this.$confirm('确定退货此商品?', '提示', {
+									confirmButtonText: '确定',
+									cancelButtonText: '取消',
+									type: 'warning'
+								}).then(() => {
+									var _this = this;
+									$.ajax({
+										url: 'http://localhost:8012/goods/returngood',
+										type: 'post',
+										contentType: 'application/json',
+										data:JSON.stringify(_this.returngood),
+										dataType: 'json',
+										success: function(data) {
+											if(data.success) {
+
+												_this.$message({
+													type: 'success',
+													message: '退货成功!'
+												});
+												_this.getAlLGoods() ;
+												_this.getAllReturnGood();
+											} else {
+												_this.$message.error(data.message);
+											}
+										}
+									});
+
+								}).catch(() => {
+									this.$message({
+										type: 'info',
+										message: '已取消删除'
+									});
+								});
+							} else {
+								this.$message.error("请填写完整信息！");
+								return false;
+							}
+						});
+					},
+					resetForm(formName) {
+						this.$refs[formName].resetFields();
+					},
+					//弹框的确认按钮
+					sureSel() {
+						this.settlementGood.saleman = JSON.parse(sessionStorage.getItem("user"));
+						this.settlementGood.content = this.multipleSelection;
+						this.settlementGood.pagination = this.pagination;
+						this.settlementGood.pradio = this.radio;
+						console.log(JSON.stringify(this.settlementGood));
+						var _this = this;
+						$.ajax({
+							url: 'http://localhost:8012/goods/subGoodStock',
+							type: 'post',
+							contentType: 'application/json',
+							data: JSON.stringify(_this.settlementGood),
+							dataType: 'json',
+							success: function(data) {
+								if(data.success) {
+									_this.tableData = data.data;
+									_this.page.totalCount = data.totalCount;
+									_this.page.totalPage = data.totalPage;
+									this.$message.success("结算成功!");
+									this.dialogTableVisible = false;
+								} else {
+									_this.$message.error(data.message);
+								}
+							}
+						});
+						setTimeout(() => {
+							location.reload();
+						}, 1000);
+					},
+					//结算按钮
+					Settlement() {
+						flag = 0;
+						this.multipleSelection.forEach((item)=>{
+							if(item.buy_num > item.stock) {
+								this.$message.error("【"+g.goodname+"】库存不足!");
+								flag = 1;
+							}
+						})
+						if(flag == 0) {
+							this.gridData = this.multipleSelection;
+							this.dialogTableVisible = true;
+						}
+						/*this.gridData = this.multipleSelection;
+						this.settlementGood.saleman = JSON.parse(sessionStorage.getItem("user"));
+						this.settlementGood.content = this.multipleSelection;
+						this.settlementGood.pagination = this.pagination;
+						this.settlementGood.pradio = this.radio;
+						console.log(JSON.stringify(this.settlementGood));
+						var _this = this;
+						$.ajax({
+							url: 'http://localhost:8012/goods/subGoodStock',
+							type: 'post',
+							contentType: 'application/json',
+							data: JSON.stringify(_this.settlementGood),
+							dataType: 'json',
+							success: function(data) {
+								if(data.success) {
+									_this.tableData = data.data;
+
+									_this.page.totalCount = data.totalCount;
+									_this.page.totalPage = data.totalPage;
+								} else {
+									_this.$message.error(data.message);
+								}
+							}
+						});*/
+					},
+					//点击会员
+					btnmember() {
+
+						this.GoodshandleSelectionChange(this.multipleSelection);
+						this.handleChange();
+					},
+					//保存当前行
+					getRowKey(row) {
+						return row.goodid;
+					},
+					//多选按钮
+					GoodshandleSelectionChange(val) {
+						this.multipleSelection = val;
+						// this.multipleSelection = val;
+						var _this = this;
+						var count = 0;
+						var countPrice = 0;
+						var flagStock;
+						val.forEach(function(v) {
+							if(v.buy_num == undefined)
+								v.buy_num = 1;
+							//遍历字符串 截取字符串 得到库存数量
+							for(var i = 0; i < v.stock.length; i++) {
+								if((v.stock.charAt(i) < '0' || v.stock.charAt(i) > '9') && (v.stock.charAt(i) != '.')) {
+									flagStock = String.valueOf(v.stock.charAt(i));
+									break;
+								}
+							}
+							var str = new Array();
+							str = v.stock.split(flagStock);
+							var st = parseInt(str[0]);
+							if(st<=1) {
+								_this.$refs.multipleTable.toggleRowSelection(v);
+							}else {
+								if(v.buy_num > st) { //判断需求量是否小于库存量
+
+								// _this.$nextTick(()=>{
+								// 	v.buy_num = st	;
+								// })
+								v.buy_num = st -1;
+								_this.$message.error("【"+v.goodname+"】库存不足!");
+							}
+							count += v.buy_num;
+								if(_this.radio == "普通") {
+									countPrice += v.buy_num * v.price;
+								} else {
+									countPrice += v.buy_num * v.memberprice;
+								}
+							}
+							
+
+						});
+						this.total_num = count;
+						this.total_price = Math.round(countPrice * 100) / 100;
+					},
+					//计数
+					handleChange() {
+						var _this = this;
+						var count = 0;
+						var countPrice = 0;
+						var flagStock;
+						this.multipleSelection.forEach(function(g,k) {
+							//遍历字符串 截取字符串 得到库存数量
+							for(var i = 0; i < g.stock.length; i++) {
+								if((g.stock.charAt(i) < '0' || g.stock.charAt(i) > '9') && (g.stock.charAt(i) != '.')) {
+									flagStock = String.valueOf(g.stock.charAt(i));
+									break;
+								}
+							}
+							var str = new Array();
+							str = g.stock.split(flagStock);
+							var st = parseInt(str[0]);
+						// 	if(g.buy_num>st&&st>0) {
+						// 		// _this.$nextTick(()=>{
+						// 		// 	g.buy_num = st;
+						// 		// })
+						// 		g.buy_num = st -1;
+						// 		_this.$message.error("【"+g.goodname+"】库存不足--!");
+
+						// 	}
+						// });
+						// this.GoodshandleSelectionChange(this.multipleSelection);
+						if(st<=1) {
+								_this.$refs.multipleTable.toggleRowSelection(v);
+							}else {
+								if(g.buy_num > st) { //判断需求量是否小于库存量
+
+								// _this.$nextTick(()=>{
+								// 	v.buy_num = st	;
+								// })
+								g.buy_num = st -1;
+								_this.$message.error("【"+g.goodname+"】库存不足!");
+							}
+							count += g.buy_num;
+								if(_this.radio == "普通") {
+									countPrice += g.buy_num * g.price;
+								} else {
+									countPrice += g.buy_num * g.memberprice;
+								}
+							}
+							
+
+						});
+						this.total_num = count;
+						this.total_price = Math.round(countPrice * 100) / 100;
+					},
+					/*搜索按钮*/
+					search() {
+						this.searchGood.content = this.input3;
+						this.searchGood.pagination = this.pagination;
+
+						var _this = this;
+						$.ajax({
+							url: 'http://localhost:8012/search/getInputData',
+							type: 'post',
+							contentType: 'application/json',
+							data: JSON.stringify(_this.searchGood),
+							dataType: 'json',
+							success: function(data) {
+								if(data.success) {
+
+									_this.tableData = data.data;
+									_this.page.totalCount = data.totalCount;
+									_this.page.totalPage = data.totalPage;
+								} else {
+									_this.$message.error(data.message);
+								}
+							}
+						});
+
+					},
+					//退出按钮
+					exitBtn() {
+						var _this = this;
+						$.ajax({
+							type: "post",
+							url: "http://localhost:8012/user/exit",
+							contentType: 'application/json',
+							data: JSON.stringify(JSON.parse(sessionStorage.getItem("user"))),
+							dataType: 'json',
+							success: function(data) {
+								if(data.success) {
+									if(data.code == 2) {
+
+										window.location.href = "login.html";
+
+									} else {
+
+										_this.$message.error(data.message);
+									}
+								} else {
+
+									_this.$message.error(data.message);
+
+								}
+							}
+
+						});
+
+					},
+					loadUser() {
+						let user = JSON.parse(sessionStorage.getItem("user"));
+						this.userid = user.userid;
+						this.username = user.username;
+						this.loginTime = user.logintime;
+						this.countTime = user.exittime;
+						this.countLogin = user.count;
+						document.getElementById("role").innerHTML = user.role;
+
+					},
+					/*分页*/
+					handleCurrentChange(currentPage) {
+						this.pagination.currentPage = currentPage;
+						this.getAlLGoods();
+					},
+					handleSizeChange(pageSize) {
+						this.pagination.pageSize = pageSize;
+						this.getAlLGoods();
+					},
+					//标签事件
+					handleClick(tab, event) {
+						this.tabName = tab.label;
+
+						this.getAlLGoods();
+					},
+					formatter(row, column) {
+						return row.address;
+					},
+					//获取全部商品
+					getAlLGoods() {
+						var _this = this;
+						$.ajax({
+							url: 'http://localhost:8012/goods/listAllGoods',
+							type: 'post',
+							contentType: 'application/json',
+							data: JSON.stringify(_this.pagination),
+							dataType: 'json',
+							success: function(data) {
+								if(data.success) {
+									_this.tableData = data.data;
+									_this.page.totalCount = data.totalCount;
+									_this.page.totalPage = data.totalPage;
+									
+									console.log(_this.multipleSelection)
+									_this.tableData.forEach((data,k)=>{
+										_this.multipleSelection.forEach((select)=>{
+											if(data.goodid == select.goodid) {	 
+												_this.tableData[k].buy_num = select.buy_num;
+												console.log(_this.tableData[k].buy_num);
+											}
+										})
+									})
+
+								} else {
+									_this.$message.error(data.message);
+								}
+							}
+						});
+					},
+
+				},
+				mounted() {
+					this.loadUser();
+					this.getAlLGoods();
+					this.getAllReturnGood();
+
+				}
+
+			});
+		</script>
+	</body>
+
+</html>
