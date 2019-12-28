@@ -220,10 +220,12 @@
 								</el-upload>
 
 								<el-tab-pane label="全部商品">
-									<el-table :data="tableData1" @selection-change="GoodshandleSelectionChange" style="width: 100%" :default-sort="{prop: 'goodname', order: 'descending'}">
-										<el-table-column type="selection" width="55">
+									<el-table :data="tableData1" @selection-change="GoodshandleSelectionChange" :row-key="(row)=>{ return row.goodid}" style="width: 100%" :default-sort="{prop: 'goodname', order: 'descending'}">
+										<el-table-column type="selection" width="55" :reserve-selection="true">
 										</el-table-column>
 
+										<el-table-column prop="goodid" label="商品编号" sortable width="100">
+										</el-table-column>
 										<el-table-column prop="goodname" label="商品名称" width="180">
 										</el-table-column>
 										<el-table-column prop="stock" label="库存" sortable width="180">
@@ -250,8 +252,11 @@
 								</el-tab-pane>
 								<el-tab-pane label="标准商品">
 
-									<el-table :data="tableData2" style="width: 100%" :default-sort="{prop: 'stock', order: 'descending'}">
-										<el-table-column type="selection" width="55">
+									<el-table :data="tableData2" style="width: 100%" :row-key="(row)=>{ return row.goodid}" :default-sort="{prop: 'stock', order: 'descending'}">
+										<el-table-column type="selection" width="55" :reserve-selection="true">
+										</el-table-column>
+
+										<el-table-column prop="goodid" label="商品编号" sortable width="100">
 										</el-table-column>
 										<el-table-column prop="goodname" label="商品名称" width="180">
 										</el-table-column>
@@ -277,8 +282,10 @@
 								</el-tab-pane>
 								<el-tab-pane label="称重商品">
 
-									<el-table :data="tableData3" style="width: 100%" :default-sort="{prop: 'date', order: 'descending'}">
-										<el-table-column type="selection" width="55">
+									<el-table :data="tableData3" style="width: 100%" :row-key="(row)=>{ return row.goodid}" :default-sort="{prop: 'date', order: 'descending'}">
+										<el-table-column type="selection" width="55" :reserve-selection="true">
+										</el-table-column>
+										<el-table-column prop="goodid" label="商品编号" sortable width="100">
 										</el-table-column>
 										<el-table-column prop="goodname" label="商品名称" width="180">
 										</el-table-column>
@@ -554,7 +561,7 @@
 				<el-alert style="margin-bottom: 10px;" title="注意：仅可修改售价和会员价" type="warning" center show-icon :closable="false">
 				</el-alert>
 
-				<el-form style="float:left;width:250px;" ref="form" :model="form" label-width="80px">
+				<el-form style="display: inline-block;width:250px;" ref="form" :model="form" label-width="80px">
 					<el-form-item label="商品名称:">
 						<el-input v-model="form.goodname"></el-input>
 					</el-form-item>
@@ -572,7 +579,7 @@
 					</el-form-item>
 
 				</el-form>
-				<el-form style="float:right;width:350px;" ref="form" :model="form" label-width="100px">
+				<el-form style="display: inline-block;width:350px;" ref="form" :model="form" label-width="100px">
 					<el-form-item label="">
 						<el-input type="hidden" v-model="form.name"></el-input>
 					</el-form-item>
@@ -656,7 +663,7 @@
 					</el-form-item>
 					<el-form-item label="新密码:" prop="password" :rules="[
      					 {required: true,message: '请输入密码',trigger: 'blur'},
-     					 { min: 8,max: 11,message: '长度为8到11个字符',trigger: 'blur'}
+     					 { min: 6,max: 16,message: '长度为6到16个字符',trigger: 'blur'}
    						 ]">
 						<el-input v-model="personform.password" autocomplete="off"></el-input>
 					</el-form-item>
@@ -901,6 +908,9 @@
 									success: function(data) {
 										if(data.success) {
 											_this.$message.success(data.message);
+											data.data.forEach((item)=>{
+												item.birthdate = item.birthdate.slice(0,10);
+											})
 											_this.tableData = data.data;
 											_this.dialogPersonVisible = false;
 
@@ -928,7 +938,9 @@
 							success: function(data) {
 
 								if(data.success) {
-
+									data.data.forEach((item)=>{
+										item.birthdate = item.birthdate.slice(0,10);
+									})
 									_this.tableData = data.data;
 
 								} else {
@@ -957,6 +969,9 @@
 
 								if(data.success) {
 									_this.$message.success(data.message);
+									data.data.forEach((item)=>{
+										item.birthdate = item.birthdate.slice(0,10);
+									})
 									_this.tableData = data.data;
 
 								} else {
@@ -979,6 +994,9 @@
 									success: function(data) {
 										if(data.success) {
 											_this.$message.success(data.message);
+											data.data.forEach((item)=>{
+												item.birthdate = item.birthdate.slice(0,10);
+											})
 											_this.tableData = data.data;
 
 										} else {

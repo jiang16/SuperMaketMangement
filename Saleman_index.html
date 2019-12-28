@@ -234,7 +234,7 @@
 											</template>
 
 										</div style="float:right;">
-										<span style="float:left;margin-left:100px;font-size:15px">共 {{page.totalCount}}件商品，已选择{{total_num}}件</span>
+										<span style="float:left;margin-left:100px;font-size:15px">共 {{page.totalCount}}种商品，已选择{{total_num}}件</span>
 										<div style="float:right;margin-right:120px;">
 											</span>合计： {{total_price}}元
 											<el-button type="primary" @click="Settlement">结算</el-button>
@@ -250,8 +250,10 @@
 							<el-table :data="gridData">
 								<el-table-column property="goodname" label="商品名称" width="150"></el-table-column>
 								<el-table-column property="buy_num" label="销售数量" width="200"></el-table-column>
-
 							</el-table>
+							<div style="float:right;margin-right:120px;">
+							</span>合计： {{total_price}}元
+						</div>
 							<div slot="footer" class="dialog-footer">
 
 								<el-button type="primary" @click="sureSel">确 定</el-button>
@@ -611,16 +613,16 @@
 									_this.tableData = data.data;
 									_this.page.totalCount = data.totalCount;
 									_this.page.totalPage = data.totalPage;
-									this.$message.success("结算成功!");
-									this.dialogTableVisible = false;
+									_this.$message.success("结算成功!");
+									_this.dialogTableVisible = false;
+									setTimeout(() => {
+										location.reload();
+									}, 1000);
 								} else {
 									_this.$message.error(data.message);
 								}
 							}
 						});
-						setTimeout(() => {
-							location.reload();
-						}, 1000);
 					},
 					//结算按钮
 					Settlement() {
