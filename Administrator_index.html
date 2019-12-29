@@ -459,7 +459,7 @@
 										<el-button @click="search" slot="append" icon="el-icon-search"></el-button>
 									</el-input>
 								</div>
-								<el-table :data="tableData1" style="width: 100%" :default-sort="{prop: 'goodid', order: 'descending'}">
+								<el-table :data="tableData1" style="width: 100%" :default-sort="{prop: 'goodid', order: 'ascing'}">
 									<el-table-column prop="goodid" label="商品编号" width="100">
 									</el-table-column>
 
@@ -537,8 +537,6 @@
 								<el-table-column prop="price" label="售价" sortable width="160">
 								</el-table-column>
 								<el-table-column prop="saledate" label="销售日期" sortable width="160">
-								</el-table-column>
-								<el-table-column prop="salemanid" label="销售员号" width="160">
 								</el-table-column>
 								<el-table-column prop="saleman" label="销售员" width="160">
 								</el-table-column>
@@ -830,6 +828,10 @@
 					
 					/*订单搜索*/
 					searchOrder() {
+						this.paginationOrder.currentPage = 1;
+						this.getSearchOrder();
+					},
+					getSearchOrder() {
 						this.flag = 1;
 						this.order.paginationOrder = this.paginationOrder;
 						this.order.starttime = this.timevalue[0];
@@ -859,7 +861,7 @@
 					handleCurrentChangeOrder(currentPage) {
 						this.paginationOrder.currentPage = currentPage;
 						if(this.flag == 1) {
-							this.searchOrder();
+							this.getSearchOrder();
 						} else if(this.flag == 0) {
 							this.getAllOrder();
 						}
@@ -868,7 +870,7 @@
 					handleSizeChangeOrder(pageSize) {
 						this.paginatOrionOrder.pageSize = pageSize;
 						if(this.flag == 1) {
-							this.searchOrder();
+							this.getSearchOrder();
 						} else if(this.flag == 0) {
 							this.getAllOrder();
 						}
@@ -1022,6 +1024,7 @@
 
 						this.$refs[formName].resetFields();
 					},
+
 					/*确定进货*/
 					purchaseSure() {
 						this.$refs['purchaseform'].validate((valid) => {
@@ -1243,6 +1246,7 @@
 					search() {
 						this.activeNames = "first";
 						this.searchGood.content = this.input3;
+						this.pagination.currentPage = 1;
 						this.searchGood.pagination = this.pagination;
 
 						var _this = this;
