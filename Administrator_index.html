@@ -206,7 +206,7 @@
 
 						<!-- 显示 -->
 						<div class="data-div">
-							<el-tabs type="border-card" @tab-click="handleClick">
+							<el-tabs type="border-card" @tab-click="handleClick" v-model="activeNames">
 								<div style="margin-top: 15px;margin-bottom: 15px;">
 									<el-input style="width:300px;margin-left: 100px;float:left;" placeholder="请输入商品名称" v-model="input3" class="input-with-select">
 										<el-button @click="search" slot="append" icon="el-icon-search"></el-button>
@@ -219,8 +219,8 @@
 									<el-button type="primary">批量导入<i class="el-icon-upload el-icon--right"></i></el-button>
 								</el-upload>
 
-								<el-tab-pane label="全部商品">
-									<el-table :data="tableData1" @selection-change="GoodshandleSelectionChange" :row-key="(row)=>{ return row.goodid}" style="width: 100%" :default-sort="{prop: 'goodname', order: 'descending'}">
+								<el-tab-pane label="全部商品" name="first">
+									<el-table :data="tableData1" @selection-change="GoodshandleSelectionChange" :row-key="(row)=>{ return row.goodid}" style="width: 100%" :default-sort="{prop: 'goodid', order: 'ascing'}">
 										<el-table-column type="selection" width="55" :reserve-selection="true">
 										</el-table-column>
 
@@ -250,7 +250,7 @@
 										</el-pagination>
 									</div>
 								</el-tab-pane>
-								<el-tab-pane label="标准商品">
+								<el-tab-pane label="标准商品" name="second">
 
 									<el-table :data="tableData2" style="width: 100%" :row-key="(row)=>{ return row.goodid}" :default-sort="{prop: 'stock', order: 'descending'}">
 										<el-table-column type="selection" width="55" :reserve-selection="true">
@@ -280,7 +280,7 @@
 										</el-pagination>
 									</div>
 								</el-tab-pane>
-								<el-tab-pane label="称重商品">
+								<el-tab-pane label="称重商品" name="third">
 
 									<el-table :data="tableData3" style="width: 100%" :row-key="(row)=>{ return row.goodid}" :default-sort="{prop: 'date', order: 'descending'}">
 										<el-table-column type="selection" width="55" :reserve-selection="true">
@@ -459,8 +459,8 @@
 										<el-button @click="search" slot="append" icon="el-icon-search"></el-button>
 									</el-input>
 								</div>
-								<el-table :data="tableData1" @selection-change="GoodshandleSelectionChange" style="width: 100%" :default-sort="{prop: 'goodname', order: 'descending'}">
-									<el-table-column type="selection" width="55">
+								<el-table :data="tableData1" style="width: 100%" :default-sort="{prop: 'goodid', order: 'descending'}">
+									<el-table-column prop="goodid" label="商品编号" width="100">
 									</el-table-column>
 
 									<el-table-column prop="goodname" label="商品名称" width="180">
@@ -555,54 +555,54 @@
 
 				</div>
 			</div>
-
+			<!-- 编辑商品 -->
 			<!--弹出框 显示导入商品项-->
 			<el-dialog title="商品信息修改" :visible.sync="dialogVisible" width="50%">
-				<el-alert style="margin-bottom: 10px;" title="注意：仅可修改售价和会员价" type="warning" center show-icon :closable="false">
+				<el-alert style="margin-bottom: 10px;" title="商品信息请填写完整" type="warning" center show-icon :closable="false">
 				</el-alert>
 
-				<el-form style="display: inline-block;width:250px;" ref="form" :model="form" label-width="80px">
-					<el-form-item label="商品名称:">
-						<el-input v-model="form.goodname"></el-input>
+				<el-form style="display: inline-block;" :model='form' ref="form" label-width="180px">
+					<el-form-item label="商品编号:">
+						<el-input v-model="form.goodid" :disabled="true"></el-input>
+					</el-form-item>
+					<el-form-item label="商品名称:" prop='goodname'>
+						<el-input v-model="form.goodname" :disabled="true"></el-input>
 					</el-form-item>
 					<el-form-item label="库存:">
-						<el-input v-model="form.stock"></el-input>
+						<el-input v-model="form.stock" :disabled="true"></el-input>
 					</el-form-item>
-					<el-form-item label="原售价:">
-						<el-input v-model="form.price"></el-input>
+					<el-form-item label="售价"  prop="price" :rules="[
+					{ required: true, message: '价格不能为空'},
+						]">
+						<el-input type="number" v-model="form.price" autocomplete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="原会员价:">
-						<el-input v-model="form.memberprice"></el-input>
-					</el-form-item>
-					<el-form-item label="类别:">
-						<el-input v-model="form.category"></el-input>
-					</el-form-item>
-
-				</el-form>
-				<el-form style="display: inline-block;width:350px;" ref="form" :model="form" label-width="100px">
-					<el-form-item label="">
-						<el-input type="hidden" v-model="form.name"></el-input>
-					</el-form-item>
-					<el-form-item label="">
-						<el-input type="hidden" v-model="form.stock"></el-input>
-					</el-form-item>
-
-					<el-form-item label="现售价" prop="newprice" :rules="[
-     					 { required: true, message: '售价不能为空'},
-     					 { type: 'number', message: '售价必须为数字值'}
-   						 ]">
-						<el-input type="number" v-model.number="form.newprice" autocomplete="off"></el-input>
-					</el-form-item>
-
-					<el-form-item label="现会员价:" prop="newmemberprice" :rules="[
+					<el-form-item label="会员价:" prop="memberprice" :rules="[
      					 { required: true, message: '会员价不能为空'},
-     					 { type: 'number', message: '会员价必须为数字值'}
    						 ]">
-						<el-input type="number" v-model.number="form.newmemberprice" autocomplete="off"></el-input>
+						<el-input type="number" v-model="form.memberprice" autocomplete="off"></el-input>
 					</el-form-item>
-
-					<el-form-item label="">
-						<el-input type="hidden" v-model="form.category"></el-input>
+					<el-form-item label="类别:" prop='category' :rules="[
+					{ required: true, message: '类别不能为空'},
+					  ]">
+						<el-select v-model="form.category">
+							<el-option value="称重">称重</el-option>
+							<el-option value="标准">标准</el-option>
+						</el-select>
+					</el-form-item>
+					<el-form-item label="供应商:" prop="supplier" :rules="[
+						{ required: true, message: '供应商不能为空'},
+							]">
+						<el-input type="text" v-model="form.supplier" autocomplete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="供应商电话:" prop="supplierphone" :rules="[
+						{ required: true, message: '供应商电话不能为空'},
+							]">
+						<el-input type="number" v-model="form.supplierphone" autocomplete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="供应商地址:" prop="supplieraddress" :rules="[
+						{ required: true, message: '供应商地址不能为空'},
+							]">
+						<el-input type="text" v-model="form.supplieraddress" autocomplete="off"></el-input>
 					</el-form-item>
 
 				</el-form>
@@ -750,8 +750,15 @@
 
 						},
 						form: {
-							newprice: '',
-							newmemberprice: '',
+							goodid:'',
+							goodname:'',
+							stock:'',
+							price: '',
+							memberprice: '',
+							category: '',
+							supplier: '',
+							supplierphone: '',
+							supplieraddress: '',
 
 						},
 						purchaseform: {
@@ -796,12 +803,6 @@
 						},
 						dialogVisible: false,
 						dialogPurchaseVisible: false,
-						updateGood: {
-							goodname: '',
-							newprice: '',
-							newmemberprice: '',
-							pagination: ''
-						},
 						goodquantity: [],
 						dayprice: [],
 						tableData: [],
@@ -821,7 +822,7 @@
 						},
 						flag: 0,
 						show: false,
-						activeNames: ['1'],
+						activeNames: "first",
 						
 					}
 				},
@@ -994,6 +995,7 @@
 									success: function(data) {
 										if(data.success) {
 											_this.$message.success(data.message);
+											_this.ruleForm = {};
 											data.data.forEach((item)=>{
 												item.birthdate = item.birthdate.slice(0,10);
 											})
@@ -1179,24 +1181,17 @@
 
 						this.$refs['form'].validate((valid) => {
 							if(valid) {
-								this.updateGood.goodname = this.form.goodname;
-								this.updateGood.newprice = this.form.newprice;
-								this.updateGood.pagination = this.pagination;
-								this.updateGood.newmemberprice = this.form.newmemberprice;
-
 								var _this = this;
 								$.ajax({
-									url: "http://localhost:8012/goods/updateGoodPrice",
+									url: "http://localhost:8012/goods/updateGood",
 									type: 'post',
 									contentType: 'application/json',
-									data: JSON.stringify(_this.updateGood),
+									data: JSON.stringify(_this.form),
 									dataType: 'json',
 									success: function(data) {
 										if(data.success) {
 											_this.$message.success(data.message);
-											_this.tableData1 = data.data;
-											_this.page.totalCount = data.totalCount;
-											_this.page.totalPage = data.totalPage;
+											_this.getAlLGoods();
 											_this.dialogVisible = false;
 
 										} else {
@@ -1233,16 +1228,9 @@
 							success: function(data) {
 								if(data.success) {
 									_this.$message.success("成功删除" + count + "条商品");
-									for(let j = 0; j < _this.GoodsmultipleSelection.length; j++) {
-										_this.tableData1.forEach((v, i) => {
-											if(gooditem[j].goodname === v.goodname) {
-												_this.tableData1.splice(i, 1);
-											}
-										})
-									}
-									_this.tableData1 = data.data;
-									_this.page.totalCount = data.totalCount;
-									_this.page.totalPage = data.totalPage;
+									setTimeout(() => {
+										location.reload();
+									}, 1000);
 								} else {
 									_this.$message.error(data.message);
 								}
@@ -1253,6 +1241,7 @@
 
 					/*搜索按钮*/
 					search() {
+						this.activeNames = "first";
 						this.searchGood.content = this.input3;
 						this.searchGood.pagination = this.pagination;
 
@@ -1318,7 +1307,7 @@
 					//标签事件
 					handleClick(tab, event) {
 						this.tabName = tab.label;
-
+						this.pagination.currentPage = 1;
 						this.getAlLGoods();
 					},
 					formatter(row, column) {
@@ -1327,12 +1316,17 @@
 
 					//编辑按钮
 					handleEdit(index, row) {
+						console.log(row.price);
 						this.dialogVisible = true;
+						this.form.goodid = row.goodid;
 						this.form.goodname = row.goodname;
 						this.form.stock = row.stock;
-						this.form.price = row.price;
+						this.form.price = (Math.floor(row.price*100)/100);
 						this.form.memberprice = row.memberprice;
 						this.form.category = row.category;
+						this.form.supplier = row.supplier;
+						this.form.supplierphone = row.supplierphone;
+						this.form.supplieraddress = row.supplieraddress;
 
 					},
 
@@ -1445,8 +1439,13 @@
 					},
 					//批量导入
 					handleSuccess(response, file, fileList) {
-						this.$message.success("导入商品成功");
-						this.getAlLGoods();
+						if(response.success == true) {
+							this.$message.success(response.message);
+							this.getAlLGoods();
+						}else {
+							this.$message.error(response.message);
+						}
+
 					},
 					beforeUpload(file) {
 						console.log(file, '文件');
