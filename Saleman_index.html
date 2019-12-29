@@ -28,7 +28,7 @@
 			.el-select .el-input {
 				width: 130px;
 			}
-			
+
 			.input-with-select .el-input-group__prepend {
 				background-color: #fff;
 			}
@@ -229,7 +229,7 @@
 									<el-col>
 										<div style="float:left;">
 											<template>
-												<el-radio v-model="radio" label="普通">普通</el-radio>
+												<el-radio v-model="radio" label="普通" @change="btnmember">普通</el-radio>
 												<el-radio v-model="radio" label="会员" @change="btnmember">会员</el-radio>
 											</template>
 
@@ -264,7 +264,7 @@
 					<!--退货管理-->
 					<div role="tabpanel" class="tab-pane" id="regu">
 
-			
+
 
 						<!-- 退货管理从这开始 -->
 						<div class="main-top" style="background-color:white;height:55px;">
@@ -279,7 +279,7 @@
 									<el-alert style="width:30%;margin-left:375px;" title="提示：可以只输入需要退货的商品号即可" type="warning" show-icon>
 									</el-alert>
 									<el-form style="margin-left:270px;width:40%;" :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-										
+
 										<el-form-item label="商品号:" prop="goodid">
 											<el-input @blur="handleInputConfirm" v-model="ruleForm.goodid"></el-input>
 										</el-form-item>
@@ -287,7 +287,7 @@
 											<el-input v-model="ruleForm.goodname" :disabled="true"></el-input>
 										</el-form-item>
 										<el-form-item label="退货量:" prop="stock">
-											<el-input v-model="ruleForm.stock" :disabled="true"></el-input>
+											<el-input v-model="ruleForm.stock" :disabled="false"></el-input>
 										</el-form-item>
 
 										<el-form-item label="供应商:" prop="supplier">
@@ -309,12 +309,12 @@
 							</div>
 						</div>
 					</div>
-				
-				
+
+
 					<!--退货详情-->
 					<div role="tabpanel" class="tab-pane" id="char">
 
-					
+
 
 						<!-- 退货详情从这开始 -->
 						<div class="main-top" style="background-color:white;height:55px;">
@@ -341,7 +341,7 @@
 										</el-table-column>
 										<el-table-column prop="" label="操作" :formatter="formatter">
 											<template slot-scope="scope">
-						
+
 												<el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
 											</template>
 										</el-table-column>
@@ -354,14 +354,14 @@
 								</div>
 							</div>
 						</div>
-					
-					
+
+
 					</div>
-				
-				
-				
-				
-				
+
+
+
+
+
 				</div>
 			</div>
 
@@ -455,7 +455,7 @@
 				methods: {
 					//删除一条退货记录
 					handleDelete(index,row){
-					
+
 						this.$confirm('确定删除此记录?', '提示', {
 									confirmButtonText: '确定',
 									cancelButtonText: '取消',
@@ -512,7 +512,7 @@
 
 									_this.pageReturn.totalCount = data.totalCount;
 									_this.pageReturn.totalPage = data.totalPage;
-								
+
 								} else {
 									_this.$message.error(data.message);
 								}
@@ -550,8 +550,8 @@
 								this.returngood.supplier = this.ruleForm.supplier;
 								this.returngood.saleman = JSON.parse(sessionStorage.getItem("user")).username
 								this.returngood.salemanid = JSON.parse(sessionStorage.getItem("user")).userid;
-								
-							
+
+
 								this.$confirm('确定退货此商品?', '提示', {
 									confirmButtonText: '确定',
 									cancelButtonText: '取消',
@@ -662,7 +662,7 @@
 							}
 						});*/
 					},
-					//点击会员
+					//更换买家状态
 					btnmember() {
 
 						this.GoodshandleSelectionChange(this.multipleSelection);
@@ -711,7 +711,7 @@
 									countPrice += v.buy_num * v.memberprice;
 								}
 							}
-							
+
 
 						});
 						this.total_num = count;
@@ -762,7 +762,7 @@
 									countPrice += g.buy_num * g.memberprice;
 								}
 							}
-							
+
 
 						});
 						this.total_num = count;
@@ -864,11 +864,11 @@
 									_this.tableData = data.data;
 									_this.page.totalCount = data.totalCount;
 									_this.page.totalPage = data.totalPage;
-									
+
 									console.log(_this.multipleSelection)
 									_this.tableData.forEach((data,k)=>{
 										_this.multipleSelection.forEach((select)=>{
-											if(data.goodid == select.goodid) {	 
+											if(data.goodid == select.goodid) {
 												_this.tableData[k].buy_num = select.buy_num;
 												console.log(_this.tableData[k].buy_num);
 											}
